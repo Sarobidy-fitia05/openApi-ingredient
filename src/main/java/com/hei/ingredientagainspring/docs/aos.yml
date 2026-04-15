@@ -1,0 +1,18 @@
+openapi: 3.0.1
+info:
+  title: API gestion des ingredients
+  description: documentation des ingredients
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /ingredients:
+    get:
+      summary: Récuperer tous les ingredients
+      responses:
+        '200':
+          description: liste des ingredients recuperé
+          content:
+            application/json:
+              schema:
+                type: array
