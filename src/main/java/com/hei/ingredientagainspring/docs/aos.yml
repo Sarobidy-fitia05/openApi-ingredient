@@ -1,18 +1,149 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
-  title: API gestion des ingredients
-  description: documentation des ingredients
+  title: API Restaurant - Gestion Ingrédients et Plats
+  description: Documentation pour le projet Spring Boot (L2 HEI).
   version: 1.0.0
+
 servers:
   - url: http://localhost:8080
+    description: Serveur local
+
 paths:
+  # --- exercice 2.a ---
   /ingredients:
     get:
-      summary: Récuperer tous les ingredients
+      summary: Récupérer tous les ingrédients
       responses:
         '200':
-          description: liste des ingredients recuperé
+          description: Succès
           content:
             application/json:
               schema:
                 type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+
+  # --- exercice 2.b ---
+  /ingredients/{id}:
+    get:
+      summary: Récupérer un ingrédient par son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Succès
+        '404':
+          description: Ingredient.id={id} is not found
+
+  # --- exercice 2.c ---
+  /ingredients/{id}/stock:
+    get:
+      summary: Récupérer la valeur du stock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: at
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: unit
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Unit'
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValue'
+
+  # --- exercice 2.d ---
+  /dishes:
+    get:
+      summary: Liste tous les plats avec leurs ingrédients
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DishRest'
+
+  # --- exercice 2.e (Le petit e) ---
+  /dishes/{id}/ingredients:
+    put:
+      summary: Modifier la liste des ingrédients d'un plat
+      description: Permet d'associer ou de dissocier des ingrédients à un plat existant.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        '200':
+          description: Liste mise à jour avec succès
+        '400':
+          description: Requête invalide
+        '404':
+          description: Dish.id={id} is not found
+
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        category: { type: string }
+        price: { type: number }
+
+    StockValue:
+      type: object
+      properties:
+        unit: { $ref: '#/components/schemas/Unit' }
+        value: { type: number }
+
+    Unit:
+      type: string
+      enum: [PCS, KG, L]
+
+    DishRest:
+      type: object
+      properties:
+        id: { type: integer }
+        price: { type: number }
+        name: { type: string }
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/DishIngredientRest'
+
+    DishIngredientRest:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        category: { type: string }
+        price: { type: number }
