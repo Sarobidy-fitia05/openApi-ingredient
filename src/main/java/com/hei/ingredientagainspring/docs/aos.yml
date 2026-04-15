@@ -36,6 +36,10 @@ paths:
       responses:
         '200':
           description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
         '404':
           description: Ingredient.id={id} is not found
 
